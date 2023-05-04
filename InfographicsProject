@@ -1,0 +1,110 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
+
+
+# Load the data
+data = pd.read_csv('customer_shopping_data.csv')
+
+# Convert date to datetime format
+data['date'] = pd.to_datetime(data['invoice_date'], format='%m/%d/%Y', errors='coerce')
+data['date'] = pd.to_datetime(data['date'], dayfirst=True)
+data.set_index('date', inplace=True)
+
+# Create revenue column
+data['revenue'] = data['quantity'] * data['price']
+
+# Create age group column
+data['age_group'] = pd.cut(x=data['age'], bins=[0, 17, 25, 35, 45, 65, 100], labels=['Children', 'Young Adults', 'Adults', 'Middle Aged Adults','Older adults', 'Senior Citizens'])
+
+# Define the dictionary with abbreviated names
+mall_names = {'Mall of Istanbul': 'MIS', 'Forum Istanbul': 'Forum', 'Metropol AVM': 'Metropol','Istinye Park': 'Istinye', 'Cevahir AVM': 'Cevahir', 'Emaar Square Mall': 'Emaar', 'Viaport Outlet': 'Viaport', 'Zorlu Center': 'Zorlu'}
+
+# Replace the full names with the abbreviated names
+data['shopping_mall'] = data['shopping_mall'].replace(mall_names)
+
+# Create a GridSpec object
+fig = plt.figure(figsize=(24, 12), dpi=300, facecolor='plum')
+gs = GridSpec(nrows=3, ncols=3, figure=fig, hspace=0.5, wspace=0.5)
+title_props = dict(boxstyle='round', facecolor='white', alpha=0.5)
+
+fig.suptitle('Data Visualization of Customer Shoppping in \n Malls of Istanbul', 
+             fontsize=14, fontweight='bold', color='red',
+             bbox=title_props)
+#fig.suptitle('Customer Shopping Data Visualization \nVishal Philip \n22020190', fontsize=14, fontweight='bold', color='red')
+#fig.patch.set_facecolor('#f2f2f2')
+
+# Create the first plot
+ax1 = fig.add_subplot(gs[0,-1])
+df_age_group = data.groupby('age_group')['customer_id'].count().reset_index()
+df_age_group.columns = ['age_group', 'quality']
+df_age_group['percent'] = (df_age_group['quality'] / df_age_group['quality'].sum() *100).round(2)
+ax1.pie(df_age_group['percent'], labels=df_age_group['age_group'].tolist(), wedgeprops=dict(width=0.5), colors = sns.color_palette("Set2"), shadow=True)
+ax1.set_title('Age group distribution')
+text = 'distribution of age groups of customers \nwho visited  malls in Istanbul.'
+ax1.text(0.5, -0.2, text, ha='center', va='center', transform=ax1.transAxes, wrap=True, bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.5'))
+#ax1.text(0.0, 0.9, text, ha='center', va='center', transform=ax1.transAxes, fontsize=8, fontweight='bold', color='red')
+#ax1.text(x=0.5, y=0.5, s="This is a long sentence that cannot fit in the plot title", ha='center', va='center', transform=ax1.transAxes, fontsize=12)
+
+# Create the second plot
+ax2 = fig.add_subplot(gs[1, :-1])
+gender_mallgrp = data.groupby('shopping_mall')['gender'].value_counts()
+ax2.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:.1f}K".format(x/1000)))
+gender_mallgrp.unstack().plot(kind='bar', stacked=False, ax=ax2)
+ax2.set_xlabel('Shopping mall')
+ax2.set_ylabel('Count')
+ax2.set_title('Shopping mall vs Gender')
+ax2.legend(title='Gender')
+ax2.set_xticklabels(gender_mallgrp.unstack().index, rotation=90)
+text = 'number of male and female customers in each shopping mall..'
+ax2.text(0.5, -0.2, text, ha='center', va='center', transform=ax1.transAxes, wrap=True, bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.5'))
+
+# Create the third plot
+ax3 = fig.add_subplot(gs[2, :-1])
+mall_revenue = data.groupby(['shopping_mall', pd.Grouper(freq='M')])['revenue'].sum().unstack(level=0)
+mall_revenue_sorted = mall_revenue.sum().sort_values(ascending=False)
+top_malls = mall_revenue_sorted.head(3).index.tolist()
+mall_revenue_top3 = mall_revenue[top_malls].loc[:'2022-10']
+ax3.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:.1f}M".format(x/1000000)))
+mall_revenue_top3.plot(ax=ax3)
+plt.legend(loc='upper right', bbox_to_anchor=(1.5, 0.6))
+ax3.set_title('Monthly revenue by Top 3 Malls')
+ax3.set_ylabel('Revenue')
+ax3.set_xlabel('Month')
+
+# Create the fourth plot
+ax4 = fig.add_subplot(gs [0, :2])
+age_mallgrp = data.groupby('shopping_mall')['age_group'].value_counts()
+ax4.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:.1f}K".format(x/1000)))
+age_mallgrp.unstack().plot(kind='bar', stacked=True, ax=ax4, color=['purple', 'orange','cornflowerblue' , 'hotpink' , 'yellowgreen', 'gold'])
+
+ax4.set_xlabel('Shopping mall')
+ax4.set_ylabel('Count')
+ax4.set_title('Shopping mall vs Age group')
+ax4.legend(title='Age group')
+ax4.set_xticklabels(age_mallgrp.unstack().index, rotation=90)
+text = 'distribution of age groups of customers \nwho visited  malls in Istanbul.'
+ax5.text(0.5, -0.2, text, ha='center', va='center', transform=ax1.transAxes, wrap=True, bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.5'))
+
+#create fifth plot
+ax5 = fig.add_subplot(gs [1, -1])
+df_payment_method = data.groupby('payment_method')['customer_id'].count().reset_index()
+df_payment_method.columns = ['payment_method', 'quality']
+df_payment_method['percent'] = (df_payment_method['quality'] / df_payment_method['quality'].sum() *100).round(2)
+
+ax5.pie(df_payment_method['percent'], labels=df_payment_method['payment_method'].tolist(), wedgeprops=dict(width=0.5), colors = sns.color_palette("Set2"), shadow=True)
+ax5.set_title('Mode of Payment')
+#ax5 = fig.add_subplot(gs[4:5, 6:9])
+#ax5.text(0.5, 0.5, 'The following plot shows the age distribution of the people visited in the mall in the past three years. From the graph, it is clear that it is the young adults who visit more and have a lion\'s share of purchase.', ha='center', va='center', size=14)
+#ax5.set_axis_off()
+# Adjust the layout and save the figure
+#plt.tight_layout()
+#plt.savefig('customer_data_visualization.png', dpi=300)
+#plt.show()
+
+# Adjust the layout and save the figure
+plt.tight_layout()
+plt.savefig('customer_data_visualization.png', dpi=300)
+plt.show()
