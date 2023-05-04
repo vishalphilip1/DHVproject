@@ -26,7 +26,7 @@ mall_names = {'Mall of Istanbul': 'MIS', 'Forum Istanbul': 'Forum', 'Metropol AV
 data['shopping_mall'] = data['shopping_mall'].replace(mall_names)
 
 # Create a GridSpec object
-fig = plt.figure(figsize=(24, 12), dpi=300, facecolor='plum')
+fig = plt.figure(figsize=(12, 24), dpi=300, facecolor='plum')
 gs = GridSpec(nrows=3, ncols=3, figure=fig, hspace=0.5, wspace=0.5)
 title_props = dict(boxstyle='round', facecolor='white', alpha=0.5)
 
@@ -43,8 +43,8 @@ df_age_group.columns = ['age_group', 'quality']
 df_age_group['percent'] = (df_age_group['quality'] / df_age_group['quality'].sum() *100).round(2)
 ax1.pie(df_age_group['percent'], labels=df_age_group['age_group'].tolist(), wedgeprops=dict(width=0.5), colors = sns.color_palette("Set2"), shadow=True)
 ax1.set_title('Age group distribution')
-text = 'distribution of age groups of customers \nwho visited  malls in Istanbul.'
-ax1.text(0.5, -0.2, text, ha='center', va='center', transform=ax1.transAxes, wrap=True, bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.5'))
+text = 'The given pie chart represents the proportion \nof different age groups of customers who \nvisited malls in Istanbul. It can be observed \nthat the highest number of customers falls \nunder the "Older adults" category, whereas the \nlowest number of customers falls under the \n"Children" category.'
+ax1.text(0.5, -0.4, text, ha='center', va='center', transform=ax1.transAxes, wrap=True, bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.5'), fontname='Times New Roman', fontsize=14,)
 #ax1.text(0.0, 0.9, text, ha='center', va='center', transform=ax1.transAxes, fontsize=8, fontweight='bold', color='red')
 #ax1.text(x=0.5, y=0.5, s="This is a long sentence that cannot fit in the plot title", ha='center', va='center', transform=ax1.transAxes, fontsize=12)
 
@@ -58,8 +58,8 @@ ax2.set_ylabel('Count')
 ax2.set_title('Shopping mall vs Gender')
 ax2.legend(title='Gender')
 ax2.set_xticklabels(gender_mallgrp.unstack().index, rotation=90)
-text = 'number of male and female customers in each shopping mall..'
-ax2.text(0.5, -0.2, text, ha='center', va='center', transform=ax1.transAxes, wrap=True, bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.5'))
+text = 'The graph depicted above shows the count of visitors to different \nmalls categorized by gender. It is evident that female visitors outnumbered \nmale visitors in all the malls. Kanyon and MIS were the most \npopular malls with the highest footfall of visitors compared to the other malls.'
+ax2.text(0.5, -0.32, text, ha='center', va='center', transform=ax2.transAxes, wrap=True, bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.5'), fontname='Times New Roman', fontsize=14,)
 
 # Create the third plot
 ax3 = fig.add_subplot(gs[2, :-1])
@@ -79,14 +79,8 @@ ax4 = fig.add_subplot(gs [0, :2])
 age_mallgrp = data.groupby('shopping_mall')['age_group'].value_counts()
 ax4.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:.1f}K".format(x/1000)))
 age_mallgrp.unstack().plot(kind='bar', stacked=True, ax=ax4, color=['purple', 'orange','cornflowerblue' , 'hotpink' , 'yellowgreen', 'gold'])
-
-ax4.set_xlabel('Shopping mall')
-ax4.set_ylabel('Count')
-ax4.set_title('Shopping mall vs Age group')
-ax4.legend(title='Age group')
-ax4.set_xticklabels(age_mallgrp.unstack().index, rotation=90)
-text = 'distribution of age groups of customers \nwho visited  malls in Istanbul.'
-ax5.text(0.5, -0.2, text, ha='center', va='center', transform=ax1.transAxes, wrap=True, bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.5'))
+text = 'The above bar chart shows the count of people belonging to various age groups \nwho visited different malls. Kanyon mall has the largest \nnumber of visitors among all the malls.'
+ax4.text(0.5, -0.3, text, ha='center', va='center', transform=ax4.transAxes, wrap=True, bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.5'), fontname='Times New Roman', fontsize=14,)
 
 #create fifth plot
 ax5 = fig.add_subplot(gs [1, -1])
