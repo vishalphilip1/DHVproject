@@ -97,7 +97,7 @@ ax5.set_title('Mode of Payment')
 #plt.tight_layout()
 #plt.savefig('customer_data_visualization.png', dpi=300)
 #plt.show()
-
+9
 # Adjust the layout and save the figure
 plt.tight_layout()
 plt.savefig('customer_data_visualization.png', dpi=300)
